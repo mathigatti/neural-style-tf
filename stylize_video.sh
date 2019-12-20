@@ -29,6 +29,16 @@ if [ ! -d "./video_input" ]; then
 fi
 temp_dir="./video_input/${content_filename}"
 
+width="${streams_stream_0_width}"
+height="${streams_stream_0_height}"
+if [ "$width" -gt "$height" ]; then
+  max_size="$width"
+else
+  max_size="$height"
+fi
+num_frames=$(find "$temp_dir" -iname "*.ppm" | wc -l)
+
+
 echo "Rendering stylized video frames [CPU & GPU]. This will take a while..."
 python neural_style.py --video \
 --video_input_dir "${temp_dir}" \
