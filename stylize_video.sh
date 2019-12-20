@@ -67,7 +67,7 @@ num_frames=$(find "$temp_dir" -iname "*.ppm" | wc -l)
 
 echo "Computing optical flow [CPU]. This will take a while..."
 cd ./video_input
-bash make-opt-flow.sh ${content_filename}/frame_%04d.ppm ${content_filename}
+#bash make-opt-flow.sh ${content_filename}/frame_%04d.ppm ${content_filename}
 cd ..
 
 echo "Rendering stylized video frames [CPU & GPU]. This will take a while..."
