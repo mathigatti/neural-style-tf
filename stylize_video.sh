@@ -12,27 +12,6 @@ command -v $FFMPEG >/dev/null 2>&1 || {
   }
 }
 
-if [ "$#" -le 1 ]; then
-   echo "Usage: bash stylize_video.sh <path_to_video> <path_to_style_image>"
-   exit 1
-fi
-
-echo ""
-read -p "Did you install the required dependencies? [y/n] $cr > " dependencies
-
-if [ "$dependencies" != "y" ]; then
-  echo "Error: Requires dependencies: tensorflow, opencv2 (python), scipy"
-  exit 1;
-fi
-
-echo ""
-read -p "Do you have a CUDA enabled GPU? [y/n] $cr > " cuda
-
-if [ "$cuda" != "y" ]; then
-  echo "Error: GPU required to render videos in a feasible amount of time."
-  exit 1;
-fi
-
 # Parse arguments
 content_video="$1"
 content_dir=$(dirname "$content_video")
@@ -49,26 +28,6 @@ if [ ! -d "./video_input" ]; then
   mkdir -p ./video_input
 fi
 temp_dir="./video_input/${content_filename}"
-
-# Create output folder
-mkdir -p "$temp_dir"
-
-# Save frames of the video as individual image files
-$FFMPEG -v quiet -i "$1" "${temp_dir}/frame_%04d.ppm"
-eval $(ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=width,height "$1")
-width="${streams_stream_0_width}"
-height="${streams_stream_0_height}"
-if [ "$width" -gt "$height" ]; then
-  max_size="$width"
-else
-  max_size="$height"
-fi
-num_frames=$(find "$temp_dir" -iname "*.ppm" | wc -l)
-
-echo "Computing optical flow [CPU]. This will take a while..."
-cd ./video_input
-#bash make-opt-flow.sh ${content_filename}/frame_%04d.ppm ${content_filename}
-cd ..
 
 echo "Rendering stylized video frames [CPU & GPU]. This will take a while..."
 python neural_style.py --video \
